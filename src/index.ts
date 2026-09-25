@@ -19,8 +19,8 @@ async function main() {
       case "create": {
         const titulo = args[1];
         const autor = args[2];
-        const precio = parseFloat(args[3]);
-        const stock = parseInt(args[4]);
+        const precio = parseFloat(String(args[3]));
+        const stock = parseInt(String(args[4]));
 
         if (!titulo || !autor || isNaN(precio) || isNaN(stock)) {
           console.log(" Error: Faltan datos o están mal escritos.");
@@ -51,8 +51,8 @@ async function main() {
         const id = args[1];
         const titulo = args[2];
         const autor = args[3];
-        const precio = parseFloat(args[4]);
-        const stock = parseInt(args[5]);
+        const precio = parseFloat(String(args[4]));
+        const stock = parseInt(String(args[5]));
 
         if (!id || !ObjectId.isValid(id)) {
           console.log(" Error: El ID ingresado no es válido o está vacío.");

@@ -23,17 +23,27 @@ async function main() {
         const stock = parseInt(args[4]);
 
         if (!titulo || !autor || isNaN(precio) || isNaN(stock)) {
-          console.log(" Error: Faltan datos.");
+          console.log(" Error: Faltan datos o están mal escritos.");
+          console.log('Uso correcto: create "El Principito" "Antoine" 15000 10');
           break;
         }
-        const resultado = await librosCollection.insertOne({ titulo, autor, precio, stock });
-        console.log("Libro creado. ID:", resultado.insertedId);
+
+        const nuevoLibro = { titulo, autor, precio, stock };
+        const resultado = await librosCollection.insertOne(nuevoLibro);
+        
+        console.log(" Libro creado con éxito. Su ID es:", resultado.insertedId);
         break;
       }
 
       case "read": {
         const libros = await librosCollection.find().toArray();
-        libros.length === 0 ? console.log("No hay libros.") : console.table(libros);
+        
+        if (libros.length === 0) {
+          console.log("No hay libros guardados en la biblioteca.");
+        } else {
+          console.log("Libros en la biblioteca:");
+          console.table(libros);
+        }
         break;
       }
 
@@ -45,7 +55,12 @@ async function main() {
         const stock = parseInt(args[5]);
 
         if (!id || !ObjectId.isValid(id)) {
-          console.log(" Error: ID inválido.");
+          console.log(" Error: El ID ingresado no es válido o está vacío.");
+          break;
+        }
+
+        if (!titulo || !autor || isNaN(precio) || isNaN(stock)) {
+          console.log(" Error: Faltan datos para actualizar.");
           break;
         }
 
@@ -54,16 +69,37 @@ async function main() {
           { $set: { titulo, autor, precio, stock } }
         );
 
-        resultado.matchedCount === 0 
-          ? console.log(" No se encontró el libro.") 
-          : console.log(" Libro actualizado correctamente.");
+        if (resultado.matchedCount === 0) {
+          console.log(" No se encontró ningún libro con ese ID.");
+        } else {
+          console.log("Libro actualizado correctamente.");
+        }
+        break;
+      }
+
+      case "delete": {
+        const id = args[1];
+
+        if (!id || !ObjectId.isValid(id)) {
+          console.log(" Error: El ID ingresado no es válido o está vacío.");
+          break;
+        }
+
+        const resultado = await librosCollection.deleteOne({ _id: new ObjectId(id) });
+
+        if (resultado.deletedCount === 0) {
+          console.log(" No se encontró ningún libro con ese ID para eliminar.");
+        } else {
+          console.log(" Libro eliminado con éxito.");
+        }
         break;
       }
 
       default:
-        console.log("Comandos: create, read, update");
+        console.log("Comando no válido. Comandos: create, read, update, delete");
         break;
     }
+
   } catch (error) {
     console.error("Hubo un error:", error);
   } finally {

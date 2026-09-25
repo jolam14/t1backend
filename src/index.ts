@@ -1,5 +1,5 @@
 import { MongoClient, ObjectId } from "mongodb";
-import dotenv from "dotenv";npx tsx src/index.ts read
+import dotenv from "dotenv";
 
 dotenv.config();
 
@@ -8,16 +8,11 @@ const client = new MongoClient(URI_DB);
 
 async function main() {
   try {
-    // Intentamos conectar
+
     await client.connect();
     console.log("¡Conexión a MongoDB exitosa! 🚀");
-
-    // Seleccionamos la base de datos y la colección
     const db = client.db("biblioteca");
     const librosCollection = db.collection("libros");
-
-    // Capturamos los argumentos que el usuario escribe en la consola
-    // process.argv[2] es la acción (create, read, update, delete)
     const accion = process.argv[2];
 
     console.log(`La acción que elegiste fue: ${accion}`);
@@ -29,5 +24,5 @@ async function main() {
   }
 }
 
-// Ejecutamos la función principal
+
 main();

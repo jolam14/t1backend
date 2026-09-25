@@ -23,36 +23,47 @@ async function main() {
         const stock = parseInt(args[4]);
 
         if (!titulo || !autor || isNaN(precio) || isNaN(stock)) {
-          console.log(" Error: Faltan datos o están mal escritos.");
-          console.log('Uso correcto: create "El Principito" "Antoine" 15000 10');
+          console.log(" Error: Faltan datos.");
           break;
         }
-
-        const nuevoLibro = { titulo, autor, precio, stock };
-        const resultado = await librosCollection.insertOne(nuevoLibro);
-        
-        console.log(" Libro creado con éxito. Su ID es:", resultado.insertedId);
+        const resultado = await librosCollection.insertOne({ titulo, autor, precio, stock });
+        console.log("Libro creado. ID:", resultado.insertedId);
         break;
       }
 
       case "read": {
-
         const libros = await librosCollection.find().toArray();
-        
-        if (libros.length === 0) {
-          console.log("No hay libros guardados en la biblioteca.");
-        } else {
-          console.log("Libros en la biblioteca:");
-          console.table(libros); 
+        libros.length === 0 ? console.log("No hay libros.") : console.table(libros);
+        break;
+      }
+
+      case "update": {
+        const id = args[1];
+        const titulo = args[2];
+        const autor = args[3];
+        const precio = parseFloat(args[4]);
+        const stock = parseInt(args[5]);
+
+        if (!id || !ObjectId.isValid(id)) {
+          console.log(" Error: ID inválido.");
+          break;
         }
+
+        const resultado = await librosCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { titulo, autor, precio, stock } }
+        );
+
+        resultado.matchedCount === 0 
+          ? console.log(" No se encontró el libro.") 
+          : console.log(" Libro actualizado correctamente.");
         break;
       }
 
       default:
-        console.log("Comando no válido. Comandos disponibles: create, read");
+        console.log("Comandos: create, read, update");
         break;
     }
-
   } catch (error) {
     console.error("Hubo un error:", error);
   } finally {
